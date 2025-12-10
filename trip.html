@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>南投週末小旅行</title>
+    <title>南投兩天一夜・色彩之旅</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&amp;family=Fredoka:wght@400;600&amp;display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
@@ -117,45 +117,42 @@
 </main>
 
 <script>
-    // --- 1. Images Configuration ---
+    // --- 1. Images Configuration (Using Robust Generative URLs) ---
     
-    // Header Slideshow Images (20 High Quality Scenic/Travel Photos)
-    const SLIDESHOW_IMAGES = [
-        "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1600&auto=format&fit=crop", // Nature
-        "https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1600&auto=format&fit=crop", // Lake
-        "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1600&auto=format&fit=crop", // Mountain
-        "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=1600&auto=format&fit=crop", // Mountains
-        "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=1600&auto=format&fit=crop", // Green field
-        "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1600&auto=format&fit=crop", // Castle vibe
-        "https://images.unsplash.com/photo-1533052770678-f7b707470487?q=80&w=1600&auto=format&fit=crop", // Forest
-        "https://images.unsplash.com/photo-1542224566-6e85f2e6772f?q=80&w=1600&auto=format&fit=crop", // Forest road
-        "https://images.unsplash.com/photo-1627409667503-4c9197c364be?q=80&w=1600&auto=format&fit=crop", // Tea garden vibe
-        "https://images.unsplash.com/photo-1587595431973-160d0d94add1?q=80&w=1600&auto=format&fit=crop", // Green hills
-        "https://images.unsplash.com/photo-1558280417-3e284a92357a?q=80&w=1600&auto=format&fit=crop", // Train
-        "https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?q=80&w=1600&auto=format&fit=crop", // Architecture
-        "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?q=80&w=1600&auto=format&fit=crop", // Resort
-        "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?q=80&w=1600&auto=format&fit=crop", // Sunset
-        "https://images.unsplash.com/photo-1516822600277-33866d99df47?q=80&w=1600&auto=format&fit=crop", // Roadtrip
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1600&auto=format&fit=crop", // Sky
-        "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=1600&auto=format&fit=crop", // Scenic
-        "https://images.unsplash.com/photo-1596392927852-2a18c336fb60?q=80&w=1600&auto=format&fit=crop", // Bubble tea/Food
-        "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?q=80&w=1600&auto=format&fit=crop", // Grass
-        "https://images.unsplash.com/photo-1598959952219-5d475657849f?q=80&w=1600&auto=format&fit=crop"  // Taiwan street vibe
+    // Helper to generate reliable photorealistic image URLs
+    function getPhotoUrl(prompt) {
+        // Adding "photorealistic, 4k, cinematic lighting" to ensure it looks like a real photo
+        const p = encodeURIComponent(prompt + ", photorealistic, 4k, cinematic lighting, high resolution photography, no text");
+        return `https://image.pollinations.ai/prompt/${p}?width=800&height=600&nologo=true&seed=${Math.floor(Math.random()*1000)}`;
+    }
+
+    // Header Slideshow Prompts (Nature & Scenery)
+    const SLIDESHOW_PROMPTS = [
+        "Beautiful Taiwan mountain landscape sunny day",
+        "Sun Moon Lake scenery blue water",
+        "Green tea plantation misty mountains",
+        "Forest hiking trail nature sunlight",
+        "Cherry blossoms in mountains taiwan",
+        "Sunset over mountain ridge clouds",
+        "Modern architecture white building blue sky",
+        "Cozy wooden cabin in forest",
+        "Fields of flowers garden",
+        "Relaxing luxury resort pool view"
     ];
 
-    // Specific Images for Itinerary Items (Replacing AI images with real-looking Unsplash photos)
-    const ATTRACTION_IMAGES = {
-        "d1-01": "https://images.unsplash.com/photo-1514216431901-83d8e09f5383?q=80&w=400&fit=crop", // HSR/Modern Station
-        "d1-02": "https://images.unsplash.com/photo-1626027376092-22df674483a3?q=80&w=400&fit=crop", // Dinosaur/Zoo
-        "d1-03": "https://images.unsplash.com/photo-1542665093-6052733d7788?q=80&w=400&fit=crop", // Blue Castle vibe
-        "d1-04": "https://images.unsplash.com/photo-1589886756627-18b855598688?q=80&w=400&fit=crop", // Wood craft/Nutcracker
-        "d1-05": "https://images.unsplash.com/photo-1563805042-7684c019e1cb?q=80&w=400&fit=crop", // Ice Cream
-        "d1-06": "https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=400&fit=crop", // Cozy Room
-        "d1-07": "https://images.unsplash.com/photo-1529198642398-7ae1eb240b2a?q=80&w=400&fit=crop", // Dumplings
-        "d2-01": "https://images.unsplash.com/photo-1493770348161-369560ae357d?q=80&w=400&fit=crop", // Breakfast
-        "d2-02": "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=400&fit=crop", // Modern White Building
-        "d2-03": "https://images.unsplash.com/photo-1606092195730-5d7b9af1ef4d?q=80&w=400&fit=crop", // Playground/Park
-        "d2-04": "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=400&fit=crop"  // Car/Driving
+    // Specific Prompts for Itinerary Items (Ensuring they match the location description)
+    const ATTRACTION_PROMPTS = {
+        "d1-01": "Modern high speed train station interior clean bright photography", 
+        "d1-02": "Dinosaur statues in a green park zoo with birds sunny photography", 
+        "d1-03": "Beautiful blue european fairytale castle building exterior sunny photography", 
+        "d1-04": "Wooden nutcracker dolls and music boxes craft workshop photography", 
+        "d1-05": "Delicious ice cream cone held in hand street background photography", 
+        "d1-06": "Cozy luxury hotel bedroom interior with window view sunlight photography", 
+        "d1-07": "Plate of delicious pan fried dumplings gyoza food photography", 
+        "d2-01": "Delicious hotel breakfast coffee and croissants sunny morning photography", 
+        "d2-02": "Modern white shopping mall building exterior blue sky photography", 
+        "d2-03": "Children playground park with green grass and slides photography", 
+        "d2-04": "Car rental service counter or car driving on road photography"  
     };
 
     // --- 2. Data Source ---
@@ -320,8 +317,9 @@
     function startSlideshow() {
         const container = document.getElementById('slideshow-container');
         
-        // Create slide elements
-        SLIDESHOW_IMAGES.forEach((url, index) => {
+        // Create slide elements using Generated Photos (guaranteed to load)
+        SLIDESHOW_PROMPTS.forEach((prompt, index) => {
+            const url = getPhotoUrl(prompt);
             const slide = document.createElement('div');
             slide.className = `slide-bg ${index === 0 ? 'active' : ''}`;
             slide.style.backgroundImage = `url('${url}')`;
@@ -332,11 +330,14 @@
         let currentIndex = 0;
         const slides = document.querySelectorAll('.slide-bg');
         
-        setInterval(() => {
-            slides[currentIndex].classList.remove('active');
-            currentIndex = (currentIndex + 1) % slides.length;
-            slides[currentIndex].classList.add('active');
-        }, 5000); // Change every 5 seconds
+        // Wait a bit for images to start loading before cycling
+        if(slides.length > 0) {
+            setInterval(() => {
+                slides[currentIndex].classList.remove('active');
+                currentIndex = (currentIndex + 1) % slides.length;
+                slides[currentIndex].classList.add('active');
+            }, 6000); // Change every 6 seconds
+        }
     }
     
     // Switch Tabs
@@ -361,7 +362,10 @@
         dayItems.forEach((item, index) => {
             const el = document.createElement('div');
             el.className = 'relative pl-4 md:pl-0';
-            const imgSrc = ATTRACTION_IMAGES[item.id] || "https://images.unsplash.com/photo-1527631746610-bca00a040d60?q=80&w=400"; // Fallback
+            
+            // Use specific prompt or fallback
+            const prompt = ATTRACTION_PROMPTS[item.id] || "Travel holiday scenery photography";
+            const imgSrc = getPhotoUrl(prompt);
 
             el.innerHTML = `
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1" onclick="toggleDetails('${item.id}')">
@@ -382,7 +386,7 @@
                                 </h3>
                                 
                                 <div class="flex items-start gap-3 mb-2">
-                                    <img src="${imgSrc}" class="w-16 h-16 rounded-lg object-cover bg-slate-100 shrink-0 shadow-md border border-slate-100">
+                                    <img src="${imgSrc}" class="w-16 h-16 rounded-lg object-cover bg-slate-100 shrink-0 shadow-md border border-slate-100" loading="lazy">
                                     <p class="text-sm text-slate-500 line-clamp-3 leading-relaxed font-medium pt-1">${item.details.desc}</p>
                                 </div>
                             </div>
