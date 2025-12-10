@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>南投兩天一夜・色彩之旅</title>
+    <title>南投週末小旅行</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&amp;family=Fredoka:wght@400;600&amp;display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
@@ -25,7 +25,7 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
         
         /* Accordion Transition */
-        .accordion-content { transition: grid-template-rows 0.3s ease-out; }
+        .accordion-content { transition: grid-template-rows 0.4s ease-out; }
         .accordion-open { grid-template-rows: 1fr; }
         .accordion-closed { grid-template-rows: 0fr; }
 
@@ -117,45 +117,77 @@
 </main>
 
 <script>
-    // --- 1. Images Configuration (Using Robust Generative URLs) ---
-    
-    // Helper to generate reliable photorealistic image URLs
-    function getPhotoUrl(prompt) {
-        // Adding "photorealistic, 4k, cinematic lighting" to ensure it looks like a real photo
-        const p = encodeURIComponent(prompt + ", photorealistic, 4k, cinematic lighting, high resolution photography, no text");
-        return `https://image.pollinations.ai/prompt/${p}?width=800&height=600&nologo=true&seed=${Math.floor(Math.random()*1000)}`;
-    }
+    // --- 1. Images Configuration (Stable Unsplash URLs) ---
+    // 這些是精心挑選的 Unsplash 圖片 ID，確保不會失效且畫質良好
 
-    // Header Slideshow Prompts (Nature & Scenery)
-    const SLIDESHOW_PROMPTS = [
-        "Beautiful Taiwan mountain landscape sunny day",
-        "Sun Moon Lake scenery blue water",
-        "Green tea plantation misty mountains",
-        "Forest hiking trail nature sunlight",
-        "Cherry blossoms in mountains taiwan",
-        "Sunset over mountain ridge clouds",
-        "Modern architecture white building blue sky",
-        "Cozy wooden cabin in forest",
-        "Fields of flowers garden",
-        "Relaxing luxury resort pool view"
+    const SLIDESHOW_IMAGES = [
+        "https://images.unsplash.com/photo-1508672019048-805c876b67e2?q=80&w=1600&auto=format&fit=crop", // Nature
+        "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1600&auto=format&fit=crop", // Foggy mountains
+        "https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1600&auto=format&fit=crop", // Lake
+        "https://images.unsplash.com/photo-1444723121867-26b5d646d637?q=80&w=1600&auto=format&fit=crop", // Forest light
+        "https://images.unsplash.com/photo-1533052770678-f7b707470487?q=80&w=1600&auto=format&fit=crop"  // Castle like
     ];
 
-    // Specific Prompts for Itinerary Items (Ensuring they match the location description)
-    const ATTRACTION_PROMPTS = {
-        "d1-01": "Modern high speed train station interior clean bright photography", 
-        "d1-02": "Dinosaur statues in a green park zoo with birds sunny photography", 
-        "d1-03": "Beautiful blue european fairytale castle building exterior sunny photography", 
-        "d1-04": "Wooden nutcracker dolls and music boxes craft workshop photography", 
-        "d1-05": "Delicious ice cream cone held in hand street background photography", 
-        "d1-06": "Cozy luxury hotel bedroom interior with window view sunlight photography", 
-        "d1-07": "Plate of delicious pan fried dumplings gyoza food photography", 
-        "d2-01": "Delicious hotel breakfast coffee and croissants sunny morning photography", 
-        "d2-02": "Modern white shopping mall building exterior blue sky photography", 
-        "d2-03": "Children playground park with green grass and slides photography", 
-        "d2-04": "Car rental service counter or car driving on road photography"  
+    // 定義每個景點的圖片 (封面圖 + 2張詳情圖)
+    const SCENE_IMAGES = {
+        "d1-01": { // High Speed Rail
+            main: "https://images.unsplash.com/photo-1558280417-3e284a92357a?q=80&w=400&fit=crop",
+            extra1: "https://images.unsplash.com/photo-1514216431901-83d8e09f5383?q=80&w=600&fit=crop",
+            extra2: "https://images.unsplash.com/photo-1465447142348-e9952c393450?q=80&w=600&fit=crop"
+        },
+        "d1-02": { // Zoo / Dinosaur Park
+            main: "https://images.unsplash.com/photo-1518558997970-4ddc236affcd?q=80&w=400&fit=crop", // Dino texture
+            extra1: "https://images.unsplash.com/photo-1626027376092-22df674483a3?q=80&w=600&fit=crop", // Dino
+            extra2: "https://images.unsplash.com/photo-1552084725-d05517f6990d?q=80&w=600&fit=crop" // Birds/Parrot
+        },
+        "d1-03": { // Blue Castle
+            main: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=400&fit=crop", // Castle exterior
+            extra1: "https://images.unsplash.com/photo-1542665093-6052733d7788?q=80&w=600&fit=crop", // European building
+            extra2: "https://images.unsplash.com/photo-1504198458649-3128b932f49e?q=80&w=600&fit=crop" // Afternoon tea/Dessert
+        },
+        "d1-04": { // Wood Workshop
+            main: "https://images.unsplash.com/photo-1589886756627-18b855598688?q=80&w=400&fit=crop", // Nutcrackers
+            extra1: "https://images.unsplash.com/photo-1615551327914-f9984605912d?q=80&w=600&fit=crop", // Wood carving
+            extra2: "https://images.unsplash.com/photo-1505330622279-bf7d7fc918f4?q=80&w=600&fit=crop" // Toys
+        },
+        "d1-05": { // Ice Cream
+            main: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?q=80&w=400&fit=crop", // Ice cream
+            extra1: "https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?q=80&w=600&fit=crop", // Scoops
+            extra2: "https://images.unsplash.com/photo-1516559828984-fb3b99548b21?q=80&w=600&fit=crop" // Street vibe
+        },
+        "d1-06": { // Hotel Rest
+            main: "https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=400&fit=crop", // Bedroom
+            extra1: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=600&fit=crop", // Luxury interior
+            extra2: "https://images.unsplash.com/photo-1512918760513-95f1929c2710?q=80&w=600&fit=crop" // Relax
+        },
+        "d1-07": { // Dumplings
+            main: "https://images.unsplash.com/photo-1529198642398-7ae1eb240b2a?q=80&w=400&fit=crop", // Dumplings main
+            extra1: "https://images.unsplash.com/photo-1626804475297-411d8c214da2?q=80&w=600&fit=crop", // Fried Gyoza
+            extra2: "https://images.unsplash.com/photo-1563245372-f21720e32c4d?q=80&w=600&fit=crop" // Night market/food
+        },
+        "d2-01": { // Breakfast
+            main: "https://images.unsplash.com/photo-1493770348161-369560ae357d?q=80&w=400&fit=crop", // Breakfast
+            extra1: "https://images.unsplash.com/photo-1533089862017-5614ec87e284?q=80&w=600&fit=crop", // Coffee
+            extra2: "https://images.unsplash.com/photo-1525351463902-39304f055259?q=80&w=600&fit=crop" // Morning vibe
+        },
+        "d2-02": { // Sun Moon Town (White Building)
+            main: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=400&fit=crop", // White modern
+            extra1: "https://images.unsplash.com/photo-1479839672679-a455b1809a6c?q=80&w=600&fit=crop", // Lifestyle/Shopping
+            extra2: "https://images.unsplash.com/photo-1481438549460-32914d109d9b?q=80&w=600&fit=crop" // Books/Cafe
+        },
+        "d2-03": { // Hao Tian Forest (Playground)
+            main: "https://images.unsplash.com/photo-1606092195730-5d7b9af1ef4d?q=80&w=400&fit=crop", // Playground
+            extra1: "https://images.unsplash.com/photo-1560943956-613d90615147?q=80&w=600&fit=crop", // Grass slide
+            extra2: "https://images.unsplash.com/photo-1596464716127-f9a875971842?q=80&w=600&fit=crop" // Fun kids
+        },
+        "d2-04": { // Return Car
+            main: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=400&fit=crop", // Driving
+            extra1: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=600&fit=crop", // Sunset
+            extra2: "https://images.unsplash.com/photo-1590502287010-333481977707?q=80&w=600&fit=crop" // Train station
+        }
     };
 
-    // --- 2. Data Source ---
+    // --- 2. Data Source with Detailed Descriptions ---
     const itineraryData = [
         // DAY 1
         {
@@ -167,6 +199,7 @@
             route: { from: "台北", to: "台中高鐵", method: "高鐵", duration: "40-60 min", fromCoords: { lat: 25.0478, lng: 121.5170 }, toCoords: { lat: 24.1120, lng: 120.6156 } },
             details: {
                 desc: "快樂出發！抵達台中後前往租車櫃檯取車。",
+                longDesc: "旅程的起點從高鐵台中站開始！這裡是中台灣的重要交通樞紐，擁有寬敞明亮的空間與便捷的租車服務。建議您提前預約租車，抵達後即可直接前往櫃檯辦理手續。拿到車後，別忘了檢查車況，調整好導航，準備迎接接下來兩天充滿色彩與驚喜的南投之旅。早晨的陽光灑落在月台，象徵著美好假期的開始。",
                 hours: "06:00 - 24:00",
                 parking: "站內立體停車場 (收費)"
             }
@@ -180,6 +213,7 @@
             route: { from: "高鐵台中站", to: "九九峰樂園", method: "開車", duration: "40 min", fromCoords: { lat: 24.1120, lng: 120.6156 }, toCoords: { lat: 23.9926, lng: 120.7554 } },
             details: {
                 desc: "南投全新寬敞動物園，必看巨大恐龍區與超親人鳥類互動。",
+                longDesc: "位於南投草屯的九九峰動物樂園，是近期最熱門的親子與網美打卡景點。園區佔地廣闊，最吸睛的莫過於栩栩如生的巨大恐龍模型，彷彿置身侏羅紀公園，非常適合拍照留念。此外，這裡最大的特色是巨型天網鳥籠，遊客可以走進其中，近距離觀察色彩斑斕的珍稀鳥類，甚至有機會與牠們親密互動。園區內綠意盎然，步道規劃完善，是個能讓大人小孩都盡情放電、親近自然的快樂天堂。",
                 hours: "09:00 - 17:00",
                 parking: "附設收費停車場 ($100/次)"
             }
@@ -194,6 +228,7 @@
             route: { from: "九九峰樂園", to: "藍色城堡", method: "開車", duration: "30 min", fromCoords: { lat: 23.9926, lng: 120.7554 }, toCoords: { lat: 23.9678, lng: 120.9705 } },
             details: {
                 desc: "夢幻歐式藍色城堡，享用精緻法式甜點與午餐，每個角落都超好拍。",
+                longDesc: "彷彿一秒飛到歐洲！這座隱身於埔里的藍色城堡 (Juliet's Castle)，以其搶眼的寶藍色外觀與精緻的歐式建築風格聞名。我們特別安排在此享用午餐，餐廳內部裝潢同樣充滿古典童話氣息，復古的傢俱、華麗的吊燈，每一個角落都是絕佳的攝影棚。餐點方面提供精緻的西式料理與招牌法式甜點，讓您在優雅的氛圍中，享受一場視覺與味覺的雙重饗宴，度過悠閒的午後時光。",
                 hours: "10:00 - 18:00",
                 parking: "城堡旁有專屬免費停車場"
             }
@@ -207,6 +242,7 @@
             route: { from: "藍色城堡", to: "敲敲木工房", method: "開車", duration: "10 min", fromCoords: { lat: 23.9678, lng: 120.9705 }, toCoords: { lat: 23.9632, lng: 120.9750 } },
             details: {
                 desc: "超可愛的胡桃鉗與音樂盒DIY工廠，免門票參觀。",
+                longDesc: "埔里早期是木工產業重鎮，敲敲木工房傳承了這份技藝，轉型為充滿童趣的音樂盒與胡桃鉗觀光工廠。一走進去，就會被整面牆的胡桃鉗娃娃震撼，色彩繽紛，超級可愛！這裡免門票參觀，非常佛心。如果您喜歡手作，強烈推薦體驗他們的 DIY 課程，親手組裝彩繪專屬的音樂盒或小板凳。這裡不僅是孩子們的樂園，也能喚起大人們的童心，是個溫馨又具教育意義的好地方。",
                 hours: "09:30 - 16:30 (週二三休)",
                 parking: "門口約5個車位，假日後方有大停車場"
             }
@@ -220,6 +256,7 @@
             route: { from: "敲敲木工房", to: "巷弄裡冰店", method: "走路", duration: "15 min", fromCoords: { lat: 23.9632, lng: 120.9750 }, toCoords: { lat: 23.9592, lng: 120.9700 } },
             details: {
                 desc: "散步去吃冰！隱藏在埔里巷弄中的消暑美味。",
+                longDesc: "真正的美味往往藏在不起眼的角落。這家位於埔里巷弄中的冰淇淋店，是當地人的私房名單。店家堅持使用真材實料的新鮮水果製作，口感綿密濃郁，且不添加過多的人工香料。每日推出的口味都不同，從經典的巧克力、抹茶，到在地的百香果、紅心芭樂，每一口都能吃到食材的原味。店面雖小但佈置溫馨，午後散步來此，點一球冰淇淋坐在長椅上享用，是旅行中簡單卻確切的幸福。",
                 hours: "10:00 - 18:00",
                 parking: "無 (建議步行前往)"
             }
@@ -233,6 +270,7 @@
             route: { from: "巷弄裡冰店", to: "藍色城堡", method: "開車", duration: "10 min", fromCoords: { lat: 23.9592, lng: 120.9700 }, toCoords: { lat: 23.9678, lng: 120.9705 } },
             details: {
                 desc: "Check-in 休息，享受城堡內的悠閒時光。",
+                longDesc: "午後時分，我們回到藍色城堡辦理入住手續。此時的光線最為柔和，陽光透過窗櫺灑落在歐式房間內，營造出極致慵懶的氛圍。您可以在房間內稍作休息，洗去旅途的疲憊，或者到民宿的公共區域享用簡單的下午茶點。城堡周圍的庭園也值得一逛，隨處可見的藝術裝置與花草植栽，讓人彷彿置身於歐洲鄉間的莊園別墅，享受難得的寧靜與奢華感。",
                 hours: "入住 15:00 後",
                 parking: "民宿停車場"
             }
@@ -246,6 +284,7 @@
             route: { from: "藍色城堡", to: "虎味煎餃", method: "開車", duration: "10 min", fromCoords: { lat: 23.9678, lng: 120.9705 }, toCoords: { lat: 23.9650, lng: 120.9650 } },
             details: {
                 desc: "晚餐時間，品嚐在地熱門的鐵板煎餃 (請確認現場候位狀況)。",
+                longDesc: "晚餐我們來到埔里超人氣的文青風煎餃店——虎味。這家店雖然店面不大，但人氣極高，經常大排長龍。他們的特色是用鐵板將煎餃底部煎得金黃酥脆，呈現完美的「冰花」狀，咬下去會有卡滋的聲音，內餡則是飽滿多汁，豬肉的鮮甜在口中爆開。除了煎餃，他們的湯品和小菜也相當精緻。建議一定要試試看他們的特製沾醬，帶點微辣的口感更能提昇煎餃的風味。這頓晚餐絕對能滿足您的味蕾！",
                 hours: "17:00 - 20:00",
                 parking: "路邊停車"
             }
@@ -260,6 +299,7 @@
             route: { from: "藍色城堡", to: "藍色城堡", method: "原地", duration: "-", fromCoords: { lat: 23.9678, lng: 120.9705 }, toCoords: { lat: 23.9678, lng: 120.9705 } },
             details: {
                 desc: "享受城堡早餐，整理行李準備退房。",
+                longDesc: "早安！在城堡中醒來是一種什麼樣的體驗？拉開窗簾，迎接南投清新的空氣與暖陽。民宿主人為您準備了豐盛的現做早餐，包含新鮮的沙拉、現烤麵包與熱咖啡，讓您在優雅的環境中開啟活力的一天。用餐後，您可以把握最後的時間在城堡園區內拍照留念，或是整理行李，準備迎接第二天的精彩行程。記得檢查隨身物品，帶著滿滿的回憶與照片辦理退房。",
                 hours: "退房時間 11:00",
                 parking: "-"
             }
@@ -273,6 +313,7 @@
             route: { from: "藍色城堡", to: "日月町", method: "開車", duration: "30 min", fromCoords: { lat: 23.9678, lng: 120.9705 }, toCoords: { lat: 23.9710, lng: 120.9300 } },
             details: {
                 desc: "全新白色系美學商場，有蔦屋書店、餐車聚落與在地選物。",
+                longDesc: "「日月町」是通往日月潭途中的全新亮點，一座純白色的幾何建築矗立在山間，極具現代美學感。這裡最受矚目的就是引進了知名的「蔦屋書店 (TSUTAYA BOOKSTORE)」，在充滿書香與咖啡香的空間裡，您可以盡情閱覽選書或購買質感文具。戶外區域則規劃了熱鬧的餐車聚落，匯集了各式特色小吃與飲品。這裡不僅好逛、好買，更是絕佳的拍照打卡點，純白建築配上藍天白雲，怎麼拍都像時尚大片。",
                 hours: "10:00 - 20:00",
                 parking: "免費大型停車場"
             }
@@ -286,6 +327,7 @@
             route: { from: "日月町", to: "好田森林", method: "開車", duration: "40 min", fromCoords: { lat: 23.9710, lng: 120.9300 }, toCoords: { lat: 23.9000, lng: 120.5300 } },
             details: {
                 desc: "彰化田尾恐龍主題親子樂園，有滑草、卡丁車與沙坑。",
+                longDesc: "行程的壓軸來到位於彰化田尾的「好田森林」。這是一個以恐龍為主題的夢幻親子樂園，園區設計充滿了熱帶雨林的探險氛圍。這裡有讓孩子瘋狂的超長滑草坡、挑戰速度感的卡丁車賽道，以及乾淨好玩的白沙坑。園區內還貼心規劃了許多休息區與美食攤位，讓家長在看顧小孩之餘也能輕鬆享用美食。陽光、草地、恐龍與歡笑聲，這裡是為這趟旅程畫下完美句點的最佳場所。",
                 hours: "10:00 - 18:00",
                 parking: "周邊收費停車場"
             }
@@ -299,6 +341,7 @@
             route: { from: "好田森林", to: "台中高鐵", method: "開車", duration: "40 min", fromCoords: { lat: 23.9000, lng: 120.5300 }, toCoords: { lat: 24.1120, lng: 120.6156 } },
             details: {
                 desc: "平安賦歸，辦理還車手續。",
+                longDesc: "快樂的時光總是過得特別快，帶著兩天一夜滿滿的回憶與戰利品，我們驅車返回高鐵台中站。沿途可以回味這兩天在城堡的夢幻、在動物園的驚奇以及美食的感動。抵達車站後，請依循租車公司的指示辦理還車手續，記得檢查車內是否有遺落個人物品。搭上高鐵，看著窗外風景飛逝，期待下一次的旅行再出發！",
                 hours: "-",
                 parking: "站區停車"
             }
@@ -317,9 +360,8 @@
     function startSlideshow() {
         const container = document.getElementById('slideshow-container');
         
-        // Create slide elements using Generated Photos (guaranteed to load)
-        SLIDESHOW_PROMPTS.forEach((prompt, index) => {
-            const url = getPhotoUrl(prompt);
+        // Create slide elements
+        SLIDESHOW_IMAGES.forEach((url, index) => {
             const slide = document.createElement('div');
             slide.className = `slide-bg ${index === 0 ? 'active' : ''}`;
             slide.style.backgroundImage = `url('${url}')`;
@@ -330,13 +372,12 @@
         let currentIndex = 0;
         const slides = document.querySelectorAll('.slide-bg');
         
-        // Wait a bit for images to start loading before cycling
         if(slides.length > 0) {
             setInterval(() => {
                 slides[currentIndex].classList.remove('active');
                 currentIndex = (currentIndex + 1) % slides.length;
                 slides[currentIndex].classList.add('active');
-            }, 6000); // Change every 6 seconds
+            }, 6000); 
         }
     }
     
@@ -363,9 +404,8 @@
             const el = document.createElement('div');
             el.className = 'relative pl-4 md:pl-0';
             
-            // Use specific prompt or fallback
-            const prompt = ATTRACTION_PROMPTS[item.id] || "Travel holiday scenery photography";
-            const imgSrc = getPhotoUrl(prompt);
+            // Get Image Data
+            const images = SCENE_IMAGES[item.id] || { main: "https://images.unsplash.com/photo-1527631746610-bca00a040d60?q=80&w=400", extra1: "", extra2: "" };
 
             el.innerHTML = `
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1" onclick="toggleDetails('${item.id}')">
@@ -386,7 +426,7 @@
                                 </h3>
                                 
                                 <div class="flex items-start gap-3 mb-2">
-                                    <img src="${imgSrc}" class="w-16 h-16 rounded-lg object-cover bg-slate-100 shrink-0 shadow-md border border-slate-100" loading="lazy">
+                                    <img src="${images.main}" class="w-16 h-16 rounded-lg object-cover bg-slate-100 shrink-0 shadow-md border border-slate-100" loading="lazy">
                                     <p class="text-sm text-slate-500 line-clamp-3 leading-relaxed font-medium pt-1">${item.details.desc}</p>
                                 </div>
                             </div>
@@ -414,14 +454,30 @@
 
                     <div id="details-${item.id}" class="grid grid-rows-[0fr] accordion-content bg-slate-50 border-t border-slate-100">
                         <div class="overflow-hidden">
-                            <div class="p-4 flex flex-wrap gap-4 text-sm">
-                                <div class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-yellow-500">store</span>
-                                    <span class="text-slate-600">營業時間: ${item.details.hours}</span>
+                            <div class="p-6">
+                                <div class="flex flex-wrap gap-4 text-sm mb-4 pb-4 border-b border-slate-200">
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-yellow-500">store</span>
+                                        <span class="text-slate-600">營業時間: ${item.details.hours}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-blue-500">local_parking</span>
+                                        <span class="text-slate-600">停車: ${item.details.parking}</span>
+                                    </div>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-blue-500">local_parking</span>
-                                    <span class="text-slate-600">停車: ${item.details.parking}</span>
+                                
+                                <div class="mb-5">
+                                    <h4 class="text-sm font-bold text-slate-800 mb-2 flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-teal-600 text-lg">auto_awesome</span> 景點特色
+                                    </h4>
+                                    <p class="text-slate-600 text-sm leading-7 text-justify">
+                                        ${item.details.longDesc}
+                                    </p>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <img src="${images.extra1}" class="w-full h-32 md:h-40 object-cover rounded-xl shadow-sm hover:opacity-90 transition-opacity cursor-pointer border border-slate-200" loading="lazy">
+                                    <img src="${images.extra2}" class="w-full h-32 md:h-40 object-cover rounded-xl shadow-sm hover:opacity-90 transition-opacity cursor-pointer border border-slate-200" loading="lazy">
                                 </div>
                             </div>
                         </div>
@@ -442,13 +498,18 @@
         const icon = document.getElementById(`icon-${id}`);
         const isOpen = content.classList.contains('accordion-open');
         
-        document.querySelectorAll('.accordion-content').forEach(el => el.classList.remove('accordion-open', 'accordion-closed') || el.classList.add('accordion-closed'));
-        document.querySelectorAll('[id^="icon-"]').forEach(el => el.style.transform = 'rotate(0deg)');
+        // Close others
+        // document.querySelectorAll('.accordion-content').forEach(el => el.classList.remove('accordion-open', 'accordion-closed') || el.classList.add('accordion-closed'));
+        // document.querySelectorAll('[id^="icon-"]').forEach(el => el.style.transform = 'rotate(0deg)');
 
         if (!isOpen) {
             content.classList.remove('accordion-closed');
             content.classList.add('accordion-open');
             icon.style.transform = 'rotate(180deg)';
+        } else {
+            content.classList.remove('accordion-open');
+            content.classList.add('accordion-closed');
+            icon.style.transform = 'rotate(0deg)';
         }
     }
 
@@ -458,6 +519,8 @@
             const mapEl = document.getElementById(mapId);
             
             if (!mapEl) return;
+            // Prevent re-initialization if map already exists
+            if (mapEl._leaflet_id) return;
 
             // Initialize Leaflet Map
             const map = L.map(mapId, {
@@ -478,7 +541,7 @@
             const startCoords = [item.route.fromCoords.lat, item.route.fromCoords.lng];
             const endCoords = [item.route.toCoords.lat, item.route.toCoords.lng];
 
-            // Add Markers (Circles for cleaner look)
+            // Add Markers
             const circleOptionsStart = {
                 color: '#64748b',
                 fillColor: '#64748b',
@@ -510,7 +573,7 @@
                 padding: [20, 20]
             });
             
-            map.invalidateSize();
+            setTimeout(() => { map.invalidateSize(); }, 200);
         });
     }
 </script>
