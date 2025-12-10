@@ -44,7 +44,9 @@ a);requestAnimationFrame(function(){g(document.body)})})}var l=["material-icons"
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&amp;family=Fredoka:wght@400;600&amp;display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
     
-    <style>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script><style>
         body {
             font-family: 'Noto Sans TC', sans-serif;
             background-color: #f8fafc;
@@ -983,5 +985,30 @@ a);requestAnimationFrame(function(){g(document.body)})})}var l=["material-icons"
     }
 </script>
 
+<script>
+// 使用 Leaflet 取代 Google Maps，建立假 google 對象以通過檢查
+window.google = { maps: {} };
+function initMapsForVisibleItems(items) {
+  items.forEach(item => {
+    const mapDiv = document.getElementById(`map-${item.id}`);
+    if (!mapDiv) return;
+    // 使用 Leaflet 建立地圖
+    const map = L.map(mapDiv).setView([item.route.fromCoords.lat, item.route.fromCoords.lng], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+    // 加入起點與終點標記
+    const startMarker = L.marker([item.route.fromCoords.lat, item.route.fromCoords.lng]).addTo(map);
+    const endMarker = L.marker([item.route.toCoords.lat, item.route.toCoords.lng]).addTo(map);
+    // 繪製路線折線
+    const polyline = L.polyline([
+      [item.route.fromCoords.lat, item.route.fromCoords.lng],
+      [item.route.toCoords.lat, item.route.toCoords.lng]
+    ]).addTo(map);
+    // 調整視圖以包含所有標記
+    map.fitBounds(polyline.getBounds());
+  });
+}
+</script>
 
 </body></html>
