@@ -1028,15 +1028,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (btn.textContent.includes('下載可攜帶版 HTML')) {
       btn.remove();
     }
-  });
-  const h1 = document.querySelector('header h1');
-  if (h1) {
-    h1.childNodes.forEach(node => {
-      if (node.nodeType === Node.TEXT_NODE) {
-        node.textContent = ' 南投小旅行 ';
-      }
-    });
-  }
+
   const pill = document.querySelector('header .bg-yellow-400');
   if (pill) pill.remove();
   const weather = document.querySelector('header .p-4.flex.items-center');
