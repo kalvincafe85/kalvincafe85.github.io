@@ -62,7 +62,9 @@ a);requestAnimationFrame(function(){g(document.body)})})}var l=["material-icons"
         /* Accordion Transition */
         .accordion-content { transition: grid-template-rows 0.3s ease-out; }
         .accordion-open { grid-template-rows: 1fr; }
-        .accordion-closed { grid-template-rows: 0fr; }
+        .a
+#map-warning { display: none; }
+ccordion-closed { grid-template-rows: 0fr; }
         
         /* Hide map controls */
         .gmnoprint, .gm-control-active { display: none; }
@@ -119,10 +121,10 @@ a);requestAnimationFrame(function(){g(document.body)})})}var l=["material-icons"
         </button>
     </div>
 
-    <!-- API Key Warning (Visible only if map fails) -->
+    <!- API Key Warning (Visible o hiddennly if map fails) -->
     <div id="map-warning" class="max-w-5xl mx-auto mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
         <span class="material-symbols-outlined">warning</span>
-        注意：若地圖無法顯示，請在下載後的 HTML 檔案中搜尋 "YOUR_GOOGLE_MAPS_KEY_HERE" 並填入您自己的金鑰。
+        
     </div>
 
     <!-- Itinerary List -->
@@ -985,7 +987,7 @@ a);requestAnimationFrame(function(){g(document.body)})})}var l=["material-icons"
     }
 </script>
 
-<script>
+<script> style="display:none"
 // 使用 Leaflet 取代 Google Maps，建立假 google 對象以通過檢查
 window.google = { maps: {} };
 function initMapsForVisibleItems(items) {
