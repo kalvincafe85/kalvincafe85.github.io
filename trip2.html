@@ -1014,3 +1014,37 @@ function initMapsForVisibleItems(items) {
 </script>
 
 </body></html>
+
+<style>
+  html { font-size: 1.25rem; }
+  #itinerary-container img { width: 8rem !important; height: 8rem !important; }
+  .tab-btn span.material-symbols-outlined:first-child { display: none !important; }
+  .tab-btn { border-radius: 0.75rem !important; }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const mw = document.getElementById('map-warning');
+  if (mw) mw.remove();
+  document.querySelectorAll('button').forEach(btn => {
+    if (btn.textContent.includes('下載可攜帶版 HTML')) {
+      btn.remove();
+    }
+  });
+  const h1 = document.querySelector('header h1');
+  if (h1) {
+    h1.childNodes.forEach(node => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        node.textContent = ' 南投小旅行 ';
+      }
+    });
+  }
+  const pill = document.querySelector('header .bg-yellow-400');
+  if (pill) pill.remove();
+  const weather = document.querySelector('header .p-4.flex.items-center');
+  if (weather) {
+    weather.style.backgroundColor = '#F3F4F6';
+    weather.style.border = '1px solid #E2E8F0';
+    weather.style.boxShadow = 'none';
+  }
+});
+</script>
