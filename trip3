@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>南投週末小旅行</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&amp;family=Fredoka:wght@400;600&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8fafc;
+        }
+        .font-display {
+            font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        
+        /* Accordion Transition */
+        .accordion-content { transition: grid-template-rows 0.4s ease-out; }
+        .accordion-open { grid-template-rows: 1fr; }
+        .accordion-closed { grid-template-rows: 0fr; }
+
+        /* Map Fixes */
+        .leaflet-container {
+            background: #e2e8f0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Slideshow Animation */
+        .slide-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+            z-index: 0;
+        }
+        .slide-bg.active {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+<header class="relative bg-slate-900 text-white pb-10 overflow-hidden shadow-xl h-[450px]">
+    
+    <div id="slideshow-container" class="absolute inset-0 w-full h-full">
+    </div>
+
+    <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-teal-900/90 z-10"></div>
+    
+    <div class="container mx-auto px-6 pt-12 relative z-20 h-full flex flex-col justify-center">
+        <div class="flex flex-col md:flex-row items-end md:items-center justify-between pb-16">
+            <div class="mb-8 md:mb-0 w-full">
+                <div class="inline-block px-3 py-1 bg-yellow-400 text-teal-900 rounded-full text-xs font-bold tracking-wider mb-2 shadow-lg">南投・彰化</div>
+                <h1 class="text-4xl md:text-6xl font-display font-black leading-tight mb-2 drop-shadow-lg">
+                    週末小旅行
+                    <span class="block text-2xl font-medium opacity-90 mt-1 font-sans">Relaxing Getaway</span>
+                </h1>
+                <p class="text-white/80 text-sm md:text-base max-w-lg drop-shadow-md">
+                    探索南投的隱藏美景，從童話城堡到森林秘境，
+                    享受兩天一夜的慢活時光。
+                </p>
+            </div>
+            
+            <div class="bg-white/10 backdrop-blur-md rounded-3xl p-5 pr-8 flex items-center gap-2 border border-white/20 shadow-2xl shrink-0 transform hover:scale-105 transition-transform duration-300">
+                <img alt="Weather" class="w-24 h-24 object-contain -ml-2 filter drop-shadow-lg" src="https://cdn3d.iconscout.com/3d/premium/thumb/sunny-day-3d-icon-download-in-png-blend-fbx-gltf-file-formats--sun-cloud-weather-forecast-pack-nature-icons-4712423.png?f=webp">
+                <div>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-5xl font-black text-white drop-shadow-md font-display">22°</span>
+                        <span class="text-xl text-teal-200 font-bold">C</span>
+                    </div>
+                    <div class="text-white/90 font-medium tracking-wider text-sm mt-1 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-base">calendar_month</span> 12/20 - 21
+                        <span class="mx-1">|</span>
+                        晴時多雲
+                    </div>
+                </div>
+            </div>
+            </div>
+    </div>
+</header>
+
+<main class="container mx-auto px-4 -mt-16 relative z-30 pb-20">
+    
+    <div class="flex justify-center -mt-8 mb-10 relative z-40">
+        <div class="bg-white p-1.5 rounded-full shadow-xl flex items-center gap-1 border border-slate-100 ring-4 ring-slate-50/50">
+            
+            <button id="tab-day1" onclick="switchDay(1)" class="relative w-40 py-3 rounded-full transition-all duration-300 flex flex-col items-center justify-center group overflow-hidden bg-teal-600 text-white shadow-md">
+                <div class="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                
+                <div class="relative flex items-baseline gap-2">
+                    <span class="text-lg font-black tracking-widest font-display">DAY 1</span>
+                </div>
+                <span class="relative text-[10px] font-bold opacity-80 tracking-wider">12/20 SAT</span>
+            </button>
+    
+            <button id="tab-day2" onclick="switchDay(2)" class="relative w-40 py-3 rounded-full transition-all duration-300 flex flex-col items-center justify-center group text-slate-400 hover:text-slate-600 hover:bg-slate-50">
+                <div class="relative flex items-baseline gap-2">
+                    <span class="text-lg font-black tracking-widest font-display">DAY 2</span>
+                </div>
+                <span class="relative text-[10px] font-bold opacity-80 tracking-wider">12/21 SUN</span>
+            </button>
+    
+        </div>
+    </div>
+    <div class="max-w-5xl mx-auto space-y-5" id="itinerary-container">
+        </div>
+
+    <div class="max-w-5xl mx-auto mt-12 bg-indigo-50 border-2 border-dashed border-indigo-200 rounded-3xl p-6 relative overflow-hidden">
+        <div class="absolute top-0 right-0 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">雨備 / 時間充裕</div>
+        <div class="flex items-start gap-4">
+            <div class="bg-indigo-100 p-3 rounded-2xl text-indigo-600">
+                <span class="material-symbols-outlined text-3xl">umbrella</span>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold text-indigo-900 mb-1">備用景點：Cona's 妮娜巧克力夢想城堡</h3>
+                <p class="text-indigo-700 text-sm mb-3">絕美歐風城堡，適合拍照、買伴手禮與品嚐巧克力。</p>
+                <div class="flex gap-2 text-xs text-indigo-600 bg-white/50 inline-flex px-3 py-1 rounded-full">
+                    <span class="material-symbols-outlined text-sm">schedule</span> 10:00 - 17:30
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+// --- 1. Images Configuration (Stable Unsplash URLs) ---
+    // 這些是精心挑選的 Unsplash 圖片 ID，確保不會失效且畫質良好
+
+    const SLIDESHOW_IMAGES = [
+        "https://scontent.ftpe8-1.fna.fbcdn.net/v/t39.30808-6/474943649_122201170370209870_7796619095595390135_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeEQsvIZjHZo-kNiK7Z8sgZ3wn1zxpj3oZTCfXPGmPehlLSzeM9GqkhsAu52ghBy5_8&_nc_ohc=jtbCza2AHf8Q7kNvwFN-zNq&_nc_oc=AdnaKgrN4kdoY9zVtxfZ8ylfIwgFFZZmxNCizNdpoGLlvuc4N5qofnFdzYUrg-aaqjI&_nc_zt=23&_nc_ht=scontent.ftpe8-1.fna&_nc_gid=ZX8ttDHjRwgiU5sZm_6Cdw&oh=00_AfnpkPFlZl270kQ8NMW9inLvvys7f8d-6VnNxdchd4Y7gQ&oe=693F7A55", // Nature
+        "https://www.taiwanstay.net.tw/TSA/twpic/276262.jpg", 
+        "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1600&auto=format&fit=crop", // Foggy mountains
+        "https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1600&auto=format&fit=crop", // Lake
+        "https://res.klook.com/image/upload/fl_lossy.progressive,q_60/Mobile/City/ucosprxpgfltcqogc2eq.jpg", // Forest light
+        "https://dimg04.tripcdn.com/images/1n95o224x9139ek2d53F9.jpg"  // Castle like
+    ];
+
+    // 定義每個景點的圖片 (封面圖 + 2張詳情圖)
+    const SCENE_IMAGES = {
+        "d1-01": { // High Speed Rail
+            main: "https://img.ltn.com.tw/Upload/news/600/2023/10/02/4445486_1_1.jpg",
+            extra1: "https://images.unsplash.com/photo-1514216431901-83d8e09f5383?q=80&w=600&fit=crop",
+            extra2: "https://images.unsplash.com/photo-1465447142348-e9952c393450?q=80&w=600&fit=crop"
+        },
+        "d1-02": { // Zoo / Dinosaur Park
+            main: "https://cc.tvbs.com.tw/img/program/upload/2022/12/21/20221221174256-2667ab20.jpg", // Dino texture
+            extra1: "https://images.unsplash.com/photo-1626027376092-22df674483a3?q=80&w=600&fit=crop", // Dino
+            extra2: "https://images.unsplash.com/photo-1552084725-d05517f6990d?q=80&w=600&fit=crop" // Birds/Parrot
+        },
+        "d1-03": { // Blue Castle
+            main: "https://haohui2017.com/wp-content/uploads/2024/03/20240311215328_0.jpg", // Castle exterior
+            extra1: "https://images.unsplash.com/photo-1542665093-6052733d7788?q=80&w=600&fit=crop", // European building
+            extra2: "https://images.unsplash.com/photo-1504198458649-3128b932f49e?q=80&w=600&fit=crop" // Afternoon tea/Dessert
+        },
+        "d1-04": { // Wood Workshop
+            main: "https://scontent.ftpe8-1.fna.fbcdn.net/v/t1.6435-9/72553959_2610888129023858_3757400083901972480_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeEcPnQW1UUCfqKGDhpdhZ1FKiKaE5F-HboqIpoTkX4dupoNOKtmonfn-3iwMKxb40Q&_nc_ohc=EXTHSpaZnmEQ7kNvwGQk3Iw&_nc_oc=Adl-nLVWNlEjE26-zwGA6TRnUcwJa09I690RgXlG1TGrEYffql_yenFQvkGtfRkMPhw&_nc_zt=23&_nc_ht=scontent.ftpe8-1.fna&_nc_gid=3QnIDoVzpaA3MXgAy44b1g&oh=00_AflxzP9fX1Mvr7ey_JZ7mA1elnhyHvgPPxBRxQ40u8Xqlw&oe=6961042B", // Nutcrackers
+            extra1: "https://images.unsplash.com/photo-1615551327914-f9984605912d?q=80&w=600&fit=crop", // Wood carving
+            extra2: "https://images.unsplash.com/photo-1505330622279-bf7d7fc918f4?q=80&w=600&fit=crop" // Toys
+        },
+        "d1-05": { // Ice Cream
+            main: "https://www.ningl.tw/wp-content/uploads/2025/07/25-2-edited-1.png", // Ice cream
+            extra1: "https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?q=80&w=600&fit=crop", // Scoops
+            extra2: "https://images.unsplash.com/photo-1516559828984-fb3b99548b21?q=80&w=600&fit=crop" // Street vibe
+        },
+        "d1-06": { // Hotel Rest
+            main: "https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=400&fit=crop", // Bedroom
+            extra1: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=600&fit=crop", // Luxury interior
+            extra2: "https://images.unsplash.com/photo-1512918760513-95f1929c2710?q=80&w=600&fit=crop" // Relax
+        },
+        "d1-07": { // Dumplings
+            main: "https://www.foodnext.net/dispPageBox/getFile/GetImg.aspx?FileLocation=%2FPJ-FOODNEXT%2FFiles%2F&FileName=photo-49643-i.jpg", // Dumplings main
+            extra1: "https://images.unsplash.com/photo-1626804475297-411d8c214da2?q=80&w=600&fit=crop", // Fried Gyoza
+            extra2: "https://images.unsplash.com/photo-1563245372-f21720e32c4d?q=80&w=600&fit=crop" // Night market/food
+        },
+        "d2-01": { // Breakfast
+            main: "https://images.unsplash.com/photo-1493770348161-369560ae357d?q=80&w=400&fit=crop", // Breakfast
+            extra1: "https://images.unsplash.com/photo-1533089862017-5614ec87e284?q=80&w=600&fit=crop", // Coffee
+            extra2: "https://images.unsplash.com/photo-1525351463902-39304f055259?q=80&w=600&fit=crop" // Morning vibe
+        },
+        "d2-02": { // Sun Moon Town (White Building)
+            main: "https://shoplineimg.com/6667c917001720001c055895/66bb7c0083876f002287ffff/1296x.webp?source_format=jpg", // White modern
+            extra1: "https://images.unsplash.com/photo-1479839672679-a455b1809a6c?q=80&w=600&fit=crop", // Lifestyle/Shopping
+            extra2: "https://images.unsplash.com/photo-1481438549460-32914d109d9b?q=80&w=600&fit=crop" // Books/Cafe
+        },
+        "d2-03": { // Hao Tian Forest (Playground)
+            main: "https://baofamily.tw/wp-content/uploads/2023/10/%E5%A5%BD%E7%94%9C%E6%A3%AE%E6%9E%97-33.jpg", // Playground
+            extra1: "https://images.unsplash.com/photo-1560943956-613d90615147?q=80&w=600&fit=crop", // Grass slide
+            extra2: "https://images.unsplash.com/photo-1596464716127-f9a875971842?q=80&w=600&fit=crop" // Fun kids
+        },
+        "d2-04": { // Return Car
+            main: "https://www.carstuff.com.tw/media/k2/items/cache/d755f187a1661b96db7f27000364eae9_L.jpg", // Driving
+            extra1: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=600&fit=crop", // Sunset
+            extra2: "https://images.unsplash.com/photo-1590502287010-333481977707?q=80&w=600&fit=crop" // Train station
+        }
+    };
+
+    // --- 2. Data Source with Detailed Descriptions ---
+    const itineraryData = [
+        // DAY 1
+        {
+            day: 1,
+            id: "d1-01",
+            time: "09:00",
+            title: "高鐵台中站集合",
+            type: "transport",
+            route: { from: "台北", to: "台中高鐵", method: "高鐵", duration: "40-60 min", fromCoords: { lat: 25.0478, lng: 121.5170 }, toCoords: { lat: 24.1120, lng: 120.6156 } },
+            details: {
+                desc: "快樂出發！抵達台中後前往租車櫃檯取車。",
+                longDesc: "旅程的起點從高鐵台中站開始！這裡是中台灣的重要交通樞紐，擁有寬敞明亮的空間與便捷的租車服務。建議您提前預約租車，抵達後即可直接前往櫃檯辦理手續。拿到車後，別忘了檢查車況，調整好導航，準備迎接接下來兩天充滿色彩與驚喜的南投之旅。早晨的陽光灑落在月台，象徵著美好假期的開始。",
+                hours: "06:00 - 24:00",
+                parking: "站內立體停車場 (收費)"
+            }
+        },
+        {
+            day: 1,
+            id: "d1-02",
+            time: "10:00 - 11:30",
+            title: "九九峰動物樂園",
+            type: "activity",
+            route: { from: "高鐵台中站", to: "九九峰樂園", method: "開車", duration: "40 min", fromCoords: { lat: 24.1120, lng: 120.6156 }, toCoords: { lat: 23.9926, lng: 120.7554 } },
+            details: {
+                desc: "南投全新寬敞動物園，必看巨大恐龍區與超親人鳥類互動。",
+                longDesc: "位於南投草屯的九九峰動物樂園，是近期最熱門的親子與網美打卡景點。園區佔地廣闊，最吸睛的莫過於栩栩如生的巨大恐龍模型，彷彿置身侏羅紀公園，非常適合拍照留念。此外，這裡最大的特色是巨型天網鳥籠，遊客可以走進其中，近距離觀察色彩斑斕的珍稀鳥類，甚至有機會與牠們親密互動。園區內綠意盎然，步道規劃完善，是個能讓大人小孩都盡情放電、親近自然的快樂天堂。",
+                hours: "09:00 - 17:00",
+                parking: "附設收費停車場 ($100/次)"
+            }
+        },
+        {
+            day: 1,
+            id: "d1-03",
+            time: "12:00 - 13:30",
+            title: "藍色城堡民宿 (午餐)",
+            type: "food",
+            tag: "已訂位",
+            route: { from: "九九峰樂園", to: "藍色城堡", method: "開車", duration: "30 min", fromCoords: { lat: 23.9926, lng: 120.7554 }, toCoords: { lat: 23.9678, lng: 120.9705 } },
+            details: {
+                desc: "夢幻歐式藍色城堡，享用精緻法式甜點與午餐，每個角落都超好拍。",
+                longDesc: "彷彿一秒飛到歐洲！這座隱身於埔里的藍色城堡 (Juliet's Castle)，以其搶眼的寶藍色外觀與精緻的歐式建築風格聞名。我們特別安排在此享用午餐，餐廳內部裝潢同樣充滿古典童話氣息，復古的傢俱、華麗的吊燈，每一個角落都是絕佳的攝影棚。餐點方面提供精緻的西式料理與招牌法式甜點，讓您在優雅的氛圍中，享受一場視覺與味覺的雙重饗宴，度過悠閒的午後時光。",
+                hours: "10:00 - 18:00",
+                parking: "城堡旁有專屬免費停車場"
+            }
+        },
+        {
+            day: 1,
+            id: "d1-04",
+            time: "13:30 - 15:30",
+            title: "敲敲木工房",
+            type: "activity",
+            route: { from: "藍色城堡", to: "敲敲木工房", method: "開車", duration: "10 min", fromCoords: { lat: 23.9678, lng: 120.9705 }, toCoords: { lat: 23.9632, lng: 120.9750 } },
+            details: {
+                desc: "超可愛的胡桃鉗與音樂盒DIY工廠，免門票參觀。",
+                longDesc: "埔里早期是木工產業重鎮，敲敲木工房傳承了這份技藝，轉型為充滿童趣的音樂盒與胡桃鉗觀光工廠。一走進去，就會被整面牆的胡桃鉗娃娃震撼，色彩繽紛，超級可愛！這裡免門票參觀，非常佛心。如果您喜歡手作，強烈推薦體驗他們的 DIY 課程，親手組裝彩繪專屬的音樂盒或小板凳。這裡不僅是孩子們的樂園，也能喚起大人們的童心，是個溫馨又具教育意義的好地方。",
+                hours: "09:30 - 16:30 (週二三休)",
+                parking: "門口約5個車位，假日後方有大停車場"
+            }
+        },
+        {
+            day: 1,
+            id: "d1-05",
+            time: "順遊",
+            title: "巷弄裡 Ice Cream",
+            type: "food",
+            route: { from: "敲敲木工房", to: "巷弄裡冰店", method: "走路", duration: "15 min", fromCoords: { lat: 23.9632, lng: 120.9750 }, toCoords: { lat: 23.9592, lng: 120.9700 } },
+            details: {
+                desc: "散步去吃冰！隱藏在埔里巷弄中的消暑美味。",
+                longDesc: "真正的美味往往藏在不起眼的角落。這家位於埔里巷弄中的冰淇淋店，是當地人的私房名單。店家堅持使用真材實料的新鮮水果製作，口感綿密濃郁，且不添加過多的人工香料。每日推出的口味都不同，從經典的巧克力、抹茶，到在地的百香果、紅心芭樂，每一口都能吃到食材的原味。店面雖小但佈置溫馨，午後散步來此，點一球冰淇淋坐在長椅上享用，是旅行中簡單卻確切的幸福。",
+                hours: "10:00 - 18:00",
+                parking: "無 (建議步行前往)"
+            }
+        },
+        {
+            day: 1,
+            id: "d1-06",
+            time: "16:00 - 18:00",
+            title: "民宿下午茶 & 休息",
+            type: "rest",
+            route: { from: "巷弄裡冰店", to: "藍色城堡", method: "開車", duration: "10 min", fromCoords: { lat: 23.9592, lng: 120.9700 }, toCoords: { lat: 23.9678, lng: 120.9705 } },
+            details: {
+                desc: "Check-in 休息，享受城堡內的悠閒時光。",
+                longDesc: "午後時分，我們回到藍色城堡辦理入住手續。此時的光線最為柔和，陽光透過窗櫺灑落在歐式房間內，營造出極致慵懶的氛圍。您可以在房間內稍作休息，洗去旅途的疲憊，或者到民宿的公共區域享用簡單的下午茶點。城堡周圍的庭園也值得一逛，隨處可見的藝術裝置與花草植栽，讓人彷彿置身於歐洲鄉間的莊園別墅，享受難得的寧靜與奢華感。",
+                hours: "入住 15:00 後",
+                parking: "民宿停車場"
+            }
+        },
+        {
+            day: 1,
+            id: "d1-07",
+            time: "18:00 - 19:30",
+            title: "虎味 鉄燒煎餃",
+            type: "food",
+            route: { from: "藍色城堡", to: "虎味煎餃", method: "開車", duration: "10 min", fromCoords: { lat: 23.9678, lng: 120.9705 }, toCoords: { lat: 23.9650, lng: 120.9650 } },
+            details: {
+                desc: "晚餐時間，品嚐在地熱門的鐵板煎餃 (請確認現場候位狀況)。",
+                longDesc: "晚餐我們來到埔里超人氣的文青風煎餃店——虎味。這家店雖然店面不大，但人氣極高，經常大排長龍。他們的特色是用鐵板將煎餃底部煎得金黃酥脆，呈現完美的「冰花」狀，咬下去會有卡滋的聲音，內餡則是飽滿多汁，豬肉的鮮甜在口中爆開。除了煎餃，他們的湯品和小菜也相當精緻。建議一定要試試看他們的特製沾醬，帶點微辣的口感更能提昇煎餃的風味。這頓晚餐絕對能滿足您的味蕾！",
+                hours: "17:00 - 20:00",
+                parking: "路邊停車"
+            }
+        },
+        // DAY 2
+        {
+            day: 2,
+            id: "d2-01",
+            time: "07:30 - 11:00",
+            title: "民宿早餐 / 退房",
+            type: "rest",
+            route: { from: "藍色城堡", to: "藍色城堡", method: "原地", duration: "-", fromCoords: { lat: 23.9678, lng: 120.9705 }, toCoords: { lat: 23.9678, lng: 120.9705 } },
+            details: {
+                desc: "享受城堡早餐，整理行李準備退房。",
+                longDesc: "早安！在城堡中醒來是一種什麼樣的體驗？拉開窗簾，迎接南投清新的空氣與暖陽。民宿主人為您準備了豐盛的現做早餐，包含新鮮的沙拉、現烤麵包與熱咖啡，讓您在優雅的環境中開啟活力的一天。用餐後，您可以把握最後的時間在城堡園區內拍照留念，或是整理行李，準備迎接第二天的精彩行程。記得檢查隨身物品，帶著滿滿的回憶與照片辦理退房。",
+                hours: "退房時間 11:00",
+                parking: "-"
+            }
+        },
+        {
+            day: 2,
+            id: "d2-02",
+            time: "11:30 - 13:30",
+            title: "日月町複合式商場",
+            type: "activity",
+            route: { from: "藍色城堡", to: "日月町", method: "開車", duration: "30 min", fromCoords: { lat: 23.9678, lng: 120.9705 }, toCoords: { lat: 23.9710, lng: 120.9300 } },
+            details: {
+                desc: "全新白色系美學商場，有蔦屋書店、餐車聚落與在地選物。",
+                longDesc: "「日月町」是通往日月潭途中的全新亮點，一座純白色的幾何建築矗立在山間，極具現代美學感。這裡最受矚目的就是引進了知名的「蔦屋書店 (TSUTAYA BOOKSTORE)」，在充滿書香與咖啡香的空間裡，您可以盡情閱覽選書或購買質感文具。戶外區域則規劃了熱鬧的餐車聚落，匯集了各式特色小吃與飲品。這裡不僅好逛、好買，更是絕佳的拍照打卡點，純白建築配上藍天白雲，怎麼拍都像時尚大片。",
+                hours: "10:00 - 20:00",
+                parking: "免費大型停車場"
+            }
+        },
+        {
+            day: 2,
+            id: "d2-03",
+            time: "14:00 - 16:00",
+            title: "好田森林",
+            type: "activity",
+            route: { from: "日月町", to: "好田森林", method: "開車", duration: "40 min", fromCoords: { lat: 23.9710, lng: 120.9300 }, toCoords: { lat: 23.9000, lng: 120.5300 } },
+            details: {
+                desc: "彰化田尾恐龍主題親子樂園，有滑草、卡丁車與沙坑。",
+                longDesc: "行程的壓軸來到位於彰化田尾的「好田森林」。這是一個以恐龍為主題的夢幻親子樂園，園區設計充滿了熱帶雨林的探險氛圍。這裡有讓孩子瘋狂的超長滑草坡、挑戰速度感的卡丁車賽道，以及乾淨好玩的白沙坑。園區內還貼心規劃了許多休息區與美食攤位，讓家長在看顧小孩之餘也能輕鬆享用美食。陽光、草地、恐龍與歡笑聲，這裡是為這趟旅程畫下完美句點的最佳場所。",
+                hours: "10:00 - 18:00",
+                parking: "周邊收費停車場"
+            }
+        },
+        {
+            day: 2,
+            id: "d2-04",
+            time: "16:40 - 17:00",
+            title: "高鐵台中站 (還車)",
+            type: "transport",
+            route: { from: "好田森林", to: "台中高鐵", method: "開車", duration: "40 min", fromCoords: { lat: 23.9000, lng: 120.5300 }, toCoords: { lat: 24.1120, lng: 120.6156 } },
+            details: {
+                desc: "平安賦歸，辦理還車手續。",
+                longDesc: "快樂的時光總是過得特別快，帶著兩天一夜滿滿的回憶與戰利品，我們驅車返回高鐵台中站。沿途可以回味這兩天在城堡的夢幻、在動物園的驚奇以及美食的感動。抵達車站後，請依循租車公司的指示辦理還車手續，記得檢查車內是否有遺落個人物品。搭上高鐵，看著窗外風景飛逝，期待下一次的旅行再出發！",
+                hours: "-",
+                parking: "站區停車"
+            }
+        }
+    ];
+
+    // --- 3. App Logic ---
+    
+    // Initialize
+    window.onload = function() {
+        startSlideshow();
+        switchDay(1);
+    }
+
+    // Slideshow Function
+    function startSlideshow() {
+        const container = document.getElementById('slideshow-container');
+        
+        // Create slide elements
+        SLIDESHOW_IMAGES.forEach((url, index) => {
+            const slide = document.createElement('div');
+            slide.className = `slide-bg ${index === 0 ? 'active' : ''}`;
+            slide.style.backgroundImage = `url('${url}')`;
+            container.appendChild(slide);
+        });
+
+        // Cycle through slides
+        let currentIndex = 0;
+        const slides = document.querySelectorAll('.slide-bg');
+        
+        if(slides.length > 0) {
+            setInterval(() => {
+                slides[currentIndex].classList.remove('active');
+                currentIndex = (currentIndex + 1) % slides.length;
+                slides[currentIndex].classList.add('active');
+            }, 6000); 
+        }
+    }
+    
+    // Switch Tabs Logic (UPDATED)
+    window.switchDay = function(day) {
+        // 定義兩種狀態的樣式
+        // 狀態 1: 啟動 (Active) - 深色背景、白字、陰影
+        const activeClasses = ['bg-teal-600', 'text-white', 'shadow-md'];
+        // 狀態 2: 未啟動 (Inactive) - 淺灰字、移除背景色、移除陰影
+        const inactiveClasses = ['text-slate-400', 'hover:text-slate-600', 'hover:bg-slate-50'];
+
+        // 1. 先重置兩個按鈕到 "未啟動" 狀態
+        ['tab-day1', 'tab-day2'].forEach(id => {
+            const btn = document.getElementById(id);
+            // 移除 Active 樣式
+            btn.classList.remove(...activeClasses);
+            // 加入 Inactive 樣式
+            btn.classList.add(...inactiveClasses);
+        });
+
+        // 2. 設定被點擊的按鈕為 "啟動" 狀態
+        const targetBtn = document.getElementById(`tab-day${day}`);
+        // 移除 Inactive 樣式
+        targetBtn.classList.remove(...inactiveClasses);
+        // 加入 Active 樣式
+        targetBtn.classList.add(...activeClasses);
+
+        // 3. 渲染該日期的行程
+        renderItinerary(day);
+    }
+
+    function renderItinerary(day) {
+        const container = document.getElementById('itinerary-container');
+        container.innerHTML = '';
+
+        const dayItems = itineraryData.filter(item => item.day === day);
+
+        dayItems.forEach((item, index) => {
+            const el = document.createElement('div');
+            el.className = 'relative pl-4 md:pl-0';
+            
+            // Get Image Data
+            const images = SCENE_IMAGES[item.id] || { main: "https://images.unsplash.com/photo-1527631746610-bca00a040d60?q=80&w=400", extra1: "", extra2: "" };
+
+            el.innerHTML = `
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1" onclick="toggleDetails('${item.id}')">
+                    <div class="flex flex-col md:flex-row min-h-[140px]">
+                        
+                        <div class="p-5 flex-1 flex flex-col justify-between relative order-2 md:order-1">
+                            <div class="absolute top-4 right-4 text-slate-300 transition-transform duration-300" id="icon-${item.id}">
+                                <span class="material-symbols-outlined">expand_more</span>
+                            </div>
+                            
+                            <div>
+                                <div class="flex items-center gap-2 text-xs font-bold text-slate-400 mb-2">
+                                    <span class="material-symbols-outlined text-sm">schedule</span> ${item.time}
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-800 leading-tight mb-3 flex items-center gap-2 group-hover:text-teal-600 transition-colors">
+                                    ${item.title}
+                                    ${item.tag ? `<span class="bg-pink-100 text-pink-600 text-[14px] px-2 py-0.5 rounded-full">${item.tag}</span>` : ''}
+                                </h3>
+                                
+                                <div class="flex items-start gap-3 mb-2">
+                                    <img src="${images.main}" class="w-32 h-32 rounded-lg object-cover bg-slate-100 shrink-0 shadow-md border border-slate-100" loading="lazy">
+                                    <p class="text-sm text-slate-500 line-clamp-3 leading-relaxed font-medium pt-1">${item.details.desc}</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-50 rounded-lg px-3 py-2 border border-slate-100 flex items-center justify-between gap-2 text-xs text-slate-500 mt-2">
+                                <div class="text-center font-bold text-slate-700 w-16 truncate">${item.route.from}</div>
+                                <div class="flex-1 flex flex-col items-center">
+                                    <span class="material-symbols-outlined text-xs text-teal-500">${item.route.method === '走路' ? 'directions_walk' : 'directions_car'}</span>
+                                    <div class="h-0.5 w-full bg-slate-300 relative my-0.5"></div>
+                                    <span class="text-[14px] bg-white px-1 rounded shadow-sm border border-slate-100 relative -top-1.5">${item.route.duration}</span>
+                                </div>
+                                <div class="text-center font-bold text-slate-700 w-16 truncate">${item.route.to}</div>
+                            </div>
+                        </div>
+
+                        <div class="md:w-40 bg-slate-100 relative border-l border-slate-100 order-1 md:order-2 h-32 md:h-auto overflow-hidden">
+                             <div class="w-full h-full grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500">
+                                <div id="map-${item.id}" class="w-full h-full" style="min-height: 100%;"></div>
+                            </div>
+                            <div class="absolute bottom-1 right-1 bg-white/80 backdrop-blur text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm flex items-center gap-1 pointer-events-none text-slate-600 z-[400]">
+                                <span class="material-symbols-outlined text-[14px]">location_on</span> 地圖
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="details-${item.id}" class="grid grid-rows-[0fr] accordion-content bg-slate-50 border-t border-slate-100">
+                        <div class="overflow-hidden">
+                            <div class="p-6">
+                                <div class="flex flex-wrap gap-4 text-sm mb-4 pb-4 border-b border-slate-200">
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-yellow-500">store</span>
+                                        <span class="text-slate-600">營業時間: ${item.details.hours}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-blue-500">local_parking</span>
+                                        <span class="text-slate-600">停車: ${item.details.parking}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-5">
+                                    <h4 class="text-sm font-bold text-slate-800 mb-2 flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-teal-600 text-lg">auto_awesome</span> 景點特色
+                                    </h4>
+                                    <p class="text-slate-600 text-sm leading-7 text-justify">
+                                        ${item.details.longDesc}
+                                    </p>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <img src="${images.extra1}" class="w-full h-32 md:h-40 object-cover rounded-xl shadow-sm hover:opacity-90 transition-opacity cursor-pointer border border-slate-200" loading="lazy">
+                                    <img src="${images.extra2}" class="w-full h-32 md:h-40 object-cover rounded-xl shadow-sm hover:opacity-90 transition-opacity cursor-pointer border border-slate-200" loading="lazy">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(el);
+        });
+
+        // Init Leaflet Maps
+        setTimeout(() => {
+            initLeafletMaps(dayItems);
+        }, 100);
+    }
+
+    function toggleDetails(id) {
+        const content = document.getElementById(`details-${id}`);
+        const icon = document.getElementById(`icon-${id}`);
+        const isOpen = content.classList.contains('accordion-open');
+        
+        if (!isOpen) {
+            content.classList.remove('accordion-closed');
+            content.classList.add('accordion-open');
+            icon.style.transform = 'rotate(180deg)';
+        } else {
+            content.classList.remove('accordion-open');
+            content.classList.add('accordion-closed');
+            icon.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    function initLeafletMaps(items) {
+        items.forEach(item => {
+            const mapId = `map-${item.id}`;
+            const mapEl = document.getElementById(mapId);
+            
+            if (!mapEl) return;
+            // Prevent re-initialization if map already exists
+            if (mapEl._leaflet_id) return;
+
+            // Initialize Leaflet Map
+            const map = L.map(mapId, {
+                zoomControl: false,
+                attributionControl: false, 
+                dragging: false,      
+                touchZoom: false,
+                scrollWheelZoom: false,
+                doubleClickZoom: false,
+                boxZoom: false
+            });
+
+            // Add OpenStreetMap Tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+            }).addTo(map);
+
+            const startCoords = [item.route.fromCoords.lat, item.route.fromCoords.lng];
+            const endCoords = [item.route.toCoords.lat, item.route.toCoords.lng];
+
+            // Add Markers
+            const circleOptionsStart = {
+                color: '#64748b',
+                fillColor: '#64748b',
+                fillOpacity: 1,
+                radius: 6,
+                stroke: false
+            };
+            const circleOptionsEnd = {
+                color: '#0d9488',
+                fillColor: '#0d9488',
+                fillOpacity: 1,
+                radius: 6,
+                stroke: false
+            };
+
+            L.circleMarker(startCoords, circleOptionsStart).addTo(map);
+            L.circleMarker(endCoords, circleOptionsEnd).addTo(map);
+
+            // Add Polyline
+            const latlngs = [startCoords, endCoords];
+            const polyline = L.polyline(latlngs, {
+                color: '#0d9488',
+                weight: 4,
+                opacity: 0.8
+            }).addTo(map);
+
+            // Fit Bounds
+            map.fitBounds(polyline.getBounds(), {
+                padding: [20, 20]
+            });
+            
+            setTimeout(() => { map.invalidateSize(); }, 200);
+        });
+    }
+</script>
+
+</body>
+</html>
