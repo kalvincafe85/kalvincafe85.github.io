@@ -24,10 +24,18 @@
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
         
-        /* Accordion Transition */
-        .accordion-content { transition: grid-template-rows 0.4s ease-out; }
-        .accordion-open { grid-template-rows: 1fr; }
-        .accordion-closed { grid-template-rows: 0fr; }
+        /* --- FIX: Accordion Transition --- */
+        /* 修正展開動畫：移除 Tailwind 的 class 衝突，改用這裡的設定 */
+        .accordion-content {
+            display: grid;
+            transition: grid-template-rows 0.4s ease-out;
+        }
+        .accordion-open {
+            grid-template-rows: 1fr;
+        }
+        .accordion-closed {
+            grid-template-rows: 0fr;
+        }
 
         /* Map Fixes */
         .leaflet-container {
@@ -75,7 +83,7 @@
             </div>
             
             <div class="bg-white/10 backdrop-blur-md rounded-3xl p-5 pr-8 flex items-center gap-2 border border-white/20 shadow-2xl shrink-0 transform hover:scale-105 transition-transform duration-300">
-                <img alt="Weather" class="w-24 h-24 object-contain -ml-2 filter drop-shadow-lg" src="https://cdn3d.iconscout.com/3d/premium/thumb/sunny-day-3d-icon-download-in-png-blend-fbx-gltf-file-formats--sun-cloud-weather-forecast-pack-nature-icons-4712423.png?f=webp">
+                <img alt="Weather" class="w-24 h-24 object-contain -ml-2 filter drop-shadow-lg" src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Sun%20Behind%20Large%20Cloud.png">
                 <div>
                     <div class="flex items-baseline gap-2">
                         <span class="text-5xl font-black text-white drop-shadow-md font-display">22°</span>
@@ -88,7 +96,8 @@
                     </div>
                 </div>
             </div>
-            </div>
+
+        </div>
     </div>
 </header>
 
@@ -115,6 +124,7 @@
     
         </div>
     </div>
+
     <div class="max-w-5xl mx-auto space-y-5" id="itinerary-container">
         </div>
 
@@ -136,78 +146,75 @@
 </main>
 
 <script>
-// --- 1. Images Configuration (Stable Unsplash URLs) ---
-    // 這些是精心挑選的 Unsplash 圖片 ID，確保不會失效且畫質良好
-
+// --- 1. Images Configuration ---
     const SLIDESHOW_IMAGES = [
-        "https://scontent.ftpe8-1.fna.fbcdn.net/v/t39.30808-6/474943649_122201170370209870_7796619095595390135_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeEQsvIZjHZo-kNiK7Z8sgZ3wn1zxpj3oZTCfXPGmPehlLSzeM9GqkhsAu52ghBy5_8&_nc_ohc=jtbCza2AHf8Q7kNvwFN-zNq&_nc_oc=AdnaKgrN4kdoY9zVtxfZ8ylfIwgFFZZmxNCizNdpoGLlvuc4N5qofnFdzYUrg-aaqjI&_nc_zt=23&_nc_ht=scontent.ftpe8-1.fna&_nc_gid=ZX8ttDHjRwgiU5sZm_6Cdw&oh=00_AfnpkPFlZl270kQ8NMW9inLvvys7f8d-6VnNxdchd4Y7gQ&oe=693F7A55", // Nature
+        "https://scontent.ftpe8-1.fna.fbcdn.net/v/t39.30808-6/474943649_122201170370209870_7796619095595390135_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeEQsvIZjHZo-kNiK7Z8sgZ3wn1zxpj3oZTCfXPGmPehlLSzeM9GqkhsAu52ghBy5_8&_nc_ohc=jtbCza2AHf8Q7kNvwFN-zNq&_nc_oc=AdnaKgrN4kdoY9zVtxfZ8ylfIwgFFZZmxNCizNdpoGLlvuc4N5qofnFdzYUrg-aaqjI&_nc_zt=23&_nc_ht=scontent.ftpe8-1.fna&_nc_gid=ZX8ttDHjRwgiU5sZm_6Cdw&oh=00_AfnpkPFlZl270kQ8NMW9inLvvys7f8d-6VnNxdchd4Y7gQ&oe=693F7A55", 
         "https://www.taiwanstay.net.tw/TSA/twpic/276262.jpg", 
-        "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1600&auto=format&fit=crop", // Foggy mountains
-        "https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1600&auto=format&fit=crop", // Lake
-        "https://res.klook.com/image/upload/fl_lossy.progressive,q_60/Mobile/City/ucosprxpgfltcqogc2eq.jpg", // Forest light
-        "https://dimg04.tripcdn.com/images/1n95o224x9139ek2d53F9.jpg"  // Castle like
+        "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1600&auto=format&fit=crop", 
+        "https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1600&auto=format&fit=crop",
+        "https://res.klook.com/image/upload/fl_lossy.progressive,q_60/Mobile/City/ucosprxpgfltcqogc2eq.jpg",
+        "https://dimg04.tripcdn.com/images/1n95o224x9139ek2d53F9.jpg"
     ];
 
-    // 定義每個景點的圖片 (封面圖 + 2張詳情圖)
     const SCENE_IMAGES = {
-        "d1-01": { // High Speed Rail
+        "d1-01": { 
             main: "https://img.ltn.com.tw/Upload/news/600/2023/10/02/4445486_1_1.jpg",
             extra1: "https://images.unsplash.com/photo-1514216431901-83d8e09f5383?q=80&w=600&fit=crop",
             extra2: "https://images.unsplash.com/photo-1465447142348-e9952c393450?q=80&w=600&fit=crop"
         },
-        "d1-02": { // Zoo / Dinosaur Park
-            main: "https://cc.tvbs.com.tw/img/program/upload/2022/12/21/20221221174256-2667ab20.jpg", // Dino texture
-            extra1: "https://images.unsplash.com/photo-1626027376092-22df674483a3?q=80&w=600&fit=crop", // Dino
-            extra2: "https://images.unsplash.com/photo-1552084725-d05517f6990d?q=80&w=600&fit=crop" // Birds/Parrot
+        "d1-02": { 
+            main: "https://cc.tvbs.com.tw/img/program/upload/2022/12/21/20221221174256-2667ab20.jpg", 
+            extra1: "https://images.unsplash.com/photo-1626027376092-22df674483a3?q=80&w=600&fit=crop", 
+            extra2: "https://images.unsplash.com/photo-1552084725-d05517f6990d?q=80&w=600&fit=crop" 
         },
-        "d1-03": { // Blue Castle
-            main: "https://haohui2017.com/wp-content/uploads/2024/03/20240311215328_0.jpg", // Castle exterior
-            extra1: "https://images.unsplash.com/photo-1542665093-6052733d7788?q=80&w=600&fit=crop", // European building
-            extra2: "https://images.unsplash.com/photo-1504198458649-3128b932f49e?q=80&w=600&fit=crop" // Afternoon tea/Dessert
+        "d1-03": { 
+            main: "https://haohui2017.com/wp-content/uploads/2024/03/20240311215328_0.jpg", 
+            extra1: "https://images.unsplash.com/photo-1542665093-6052733d7788?q=80&w=600&fit=crop", 
+            extra2: "https://images.unsplash.com/photo-1504198458649-3128b932f49e?q=80&w=600&fit=crop" 
         },
-        "d1-04": { // Wood Workshop
-            main: "https://scontent.ftpe8-1.fna.fbcdn.net/v/t1.6435-9/72553959_2610888129023858_3757400083901972480_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeEcPnQW1UUCfqKGDhpdhZ1FKiKaE5F-HboqIpoTkX4dupoNOKtmonfn-3iwMKxb40Q&_nc_ohc=EXTHSpaZnmEQ7kNvwGQk3Iw&_nc_oc=Adl-nLVWNlEjE26-zwGA6TRnUcwJa09I690RgXlG1TGrEYffql_yenFQvkGtfRkMPhw&_nc_zt=23&_nc_ht=scontent.ftpe8-1.fna&_nc_gid=3QnIDoVzpaA3MXgAy44b1g&oh=00_AflxzP9fX1Mvr7ey_JZ7mA1elnhyHvgPPxBRxQ40u8Xqlw&oe=6961042B", // Nutcrackers
-            extra1: "https://images.unsplash.com/photo-1615551327914-f9984605912d?q=80&w=600&fit=crop", // Wood carving
-            extra2: "https://images.unsplash.com/photo-1505330622279-bf7d7fc918f4?q=80&w=600&fit=crop" // Toys
+        "d1-04": { 
+            main: "https://scontent.ftpe8-1.fna.fbcdn.net/v/t1.6435-9/72553959_2610888129023858_3757400083901972480_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeEcPnQW1UUCfqKGDhpdhZ1FKiKaE5F-HboqIpoTkX4dupoNOKtmonfn-3iwMKxb40Q&_nc_ohc=EXTHSpaZnmEQ7kNvwGQk3Iw&_nc_oc=Adl-nLVWNlEjE26-zwGA6TRnUcwJa09I690RgXlG1TGrEYffql_yenFQvkGtfRkMPhw&_nc_zt=23&_nc_ht=scontent.ftpe8-1.fna&_nc_gid=3QnIDoVzpaA3MXgAy44b1g&oh=00_AflxzP9fX1Mvr7ey_JZ7mA1elnhyHvgPPxBRxQ40u8Xqlw&oe=6961042B", 
+            extra1: "https://images.unsplash.com/photo-1615551327914-f9984605912d?q=80&w=600&fit=crop", 
+            extra2: "https://images.unsplash.com/photo-1505330622279-bf7d7fc918f4?q=80&w=600&fit=crop" 
         },
-        "d1-05": { // Ice Cream
-            main: "https://www.ningl.tw/wp-content/uploads/2025/07/25-2-edited-1.png", // Ice cream
-            extra1: "https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?q=80&w=600&fit=crop", // Scoops
-            extra2: "https://images.unsplash.com/photo-1516559828984-fb3b99548b21?q=80&w=600&fit=crop" // Street vibe
+        "d1-05": { 
+            main: "https://www.ningl.tw/wp-content/uploads/2025/07/25-2-edited-1.png", 
+            extra1: "https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?q=80&w=600&fit=crop", 
+            extra2: "https://images.unsplash.com/photo-1516559828984-fb3b99548b21?q=80&w=600&fit=crop" 
         },
-        "d1-06": { // Hotel Rest
-            main: "https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=400&fit=crop", // Bedroom
-            extra1: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=600&fit=crop", // Luxury interior
-            extra2: "https://images.unsplash.com/photo-1512918760513-95f1929c2710?q=80&w=600&fit=crop" // Relax
+        "d1-06": { 
+            main: "https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=400&fit=crop", 
+            extra1: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=600&fit=crop", 
+            extra2: "https://images.unsplash.com/photo-1512918760513-95f1929c2710?q=80&w=600&fit=crop" 
         },
-        "d1-07": { // Dumplings
-            main: "https://www.foodnext.net/dispPageBox/getFile/GetImg.aspx?FileLocation=%2FPJ-FOODNEXT%2FFiles%2F&FileName=photo-49643-i.jpg", // Dumplings main
-            extra1: "https://images.unsplash.com/photo-1626804475297-411d8c214da2?q=80&w=600&fit=crop", // Fried Gyoza
-            extra2: "https://images.unsplash.com/photo-1563245372-f21720e32c4d?q=80&w=600&fit=crop" // Night market/food
+        "d1-07": { 
+            main: "https://www.foodnext.net/dispPageBox/getFile/GetImg.aspx?FileLocation=%2FPJ-FOODNEXT%2FFiles%2F&FileName=photo-49643-i.jpg", 
+            extra1: "https://images.unsplash.com/photo-1626804475297-411d8c214da2?q=80&w=600&fit=crop", 
+            extra2: "https://images.unsplash.com/photo-1563245372-f21720e32c4d?q=80&w=600&fit=crop" 
         },
-        "d2-01": { // Breakfast
-            main: "https://images.unsplash.com/photo-1493770348161-369560ae357d?q=80&w=400&fit=crop", // Breakfast
-            extra1: "https://images.unsplash.com/photo-1533089862017-5614ec87e284?q=80&w=600&fit=crop", // Coffee
-            extra2: "https://images.unsplash.com/photo-1525351463902-39304f055259?q=80&w=600&fit=crop" // Morning vibe
+        "d2-01": { 
+            main: "https://images.unsplash.com/photo-1493770348161-369560ae357d?q=80&w=400&fit=crop", 
+            extra1: "https://images.unsplash.com/photo-1533089862017-5614ec87e284?q=80&w=600&fit=crop", 
+            extra2: "https://images.unsplash.com/photo-1525351463902-39304f055259?q=80&w=600&fit=crop" 
         },
-        "d2-02": { // Sun Moon Town (White Building)
-            main: "https://shoplineimg.com/6667c917001720001c055895/66bb7c0083876f002287ffff/1296x.webp?source_format=jpg", // White modern
-            extra1: "https://images.unsplash.com/photo-1479839672679-a455b1809a6c?q=80&w=600&fit=crop", // Lifestyle/Shopping
-            extra2: "https://images.unsplash.com/photo-1481438549460-32914d109d9b?q=80&w=600&fit=crop" // Books/Cafe
+        "d2-02": { 
+            main: "https://shoplineimg.com/6667c917001720001c055895/66bb7c0083876f002287ffff/1296x.webp?source_format=jpg", 
+            extra1: "https://images.unsplash.com/photo-1479839672679-a455b1809a6c?q=80&w=600&fit=crop", 
+            extra2: "https://images.unsplash.com/photo-1481438549460-32914d109d9b?q=80&w=600&fit=crop" 
         },
-        "d2-03": { // Hao Tian Forest (Playground)
-            main: "https://baofamily.tw/wp-content/uploads/2023/10/%E5%A5%BD%E7%94%9C%E6%A3%AE%E6%9E%97-33.jpg", // Playground
-            extra1: "https://images.unsplash.com/photo-1560943956-613d90615147?q=80&w=600&fit=crop", // Grass slide
-            extra2: "https://images.unsplash.com/photo-1596464716127-f9a875971842?q=80&w=600&fit=crop" // Fun kids
+        "d2-03": { 
+            main: "https://baofamily.tw/wp-content/uploads/2023/10/%E5%A5%BD%E7%94%9C%E6%A3%AE%E6%9E%97-33.jpg", 
+            extra1: "https://images.unsplash.com/photo-1560943956-613d90615147?q=80&w=600&fit=crop", 
+            extra2: "https://images.unsplash.com/photo-1596464716127-f9a875971842?q=80&w=600&fit=crop" 
         },
-        "d2-04": { // Return Car
-            main: "https://www.carstuff.com.tw/media/k2/items/cache/d755f187a1661b96db7f27000364eae9_L.jpg", // Driving
-            extra1: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=600&fit=crop", // Sunset
-            extra2: "https://images.unsplash.com/photo-1590502287010-333481977707?q=80&w=600&fit=crop" // Train station
+        "d2-04": { 
+            main: "https://www.carstuff.com.tw/media/k2/items/cache/d755f187a1661b96db7f27000364eae9_L.jpg", 
+            extra1: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=600&fit=crop", 
+            extra2: "https://images.unsplash.com/photo-1590502287010-333481977707?q=80&w=600&fit=crop" 
         }
     };
 
-    // --- 2. Data Source with Detailed Descriptions ---
+    // --- 2. Itinerary Data ---
     const itineraryData = [
         // DAY 1
         {
@@ -401,31 +408,25 @@
         }
     }
     
-    // Switch Tabs Logic (UPDATED)
+    // Switch Tabs Logic
     window.switchDay = function(day) {
         // 定義兩種狀態的樣式
-        // 狀態 1: 啟動 (Active) - 深色背景、白字、陰影
         const activeClasses = ['bg-teal-600', 'text-white', 'shadow-md'];
-        // 狀態 2: 未啟動 (Inactive) - 淺灰字、移除背景色、移除陰影
         const inactiveClasses = ['text-slate-400', 'hover:text-slate-600', 'hover:bg-slate-50'];
 
-        // 1. 先重置兩個按鈕到 "未啟動" 狀態
+        // 1. 重置按鈕
         ['tab-day1', 'tab-day2'].forEach(id => {
             const btn = document.getElementById(id);
-            // 移除 Active 樣式
             btn.classList.remove(...activeClasses);
-            // 加入 Inactive 樣式
             btn.classList.add(...inactiveClasses);
         });
 
-        // 2. 設定被點擊的按鈕為 "啟動" 狀態
+        // 2. 設定選中按鈕
         const targetBtn = document.getElementById(`tab-day${day}`);
-        // 移除 Inactive 樣式
         targetBtn.classList.remove(...inactiveClasses);
-        // 加入 Active 樣式
         targetBtn.classList.add(...activeClasses);
 
-        // 3. 渲染該日期的行程
+        // 3. 渲染
         renderItinerary(day);
     }
 
@@ -442,6 +443,8 @@
             // Get Image Data
             const images = SCENE_IMAGES[item.id] || { main: "https://images.unsplash.com/photo-1527631746610-bca00a040d60?q=80&w=400", extra1: "", extra2: "" };
 
+            // FIX: Removed "grid-rows-[0fr]" which conflicted with JS logic
+            // Added "accordion-closed" initially
             el.innerHTML = `
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1" onclick="toggleDetails('${item.id}')">
                     <div class="flex flex-col md:flex-row min-h-[140px]">
@@ -487,7 +490,7 @@
                         </div>
                     </div>
 
-                    <div id="details-${item.id}" class="grid grid-rows-[0fr] accordion-content bg-slate-50 border-t border-slate-100">
+                    <div id="details-${item.id}" class="accordion-content accordion-closed bg-slate-50 border-t border-slate-100">
                         <div class="overflow-hidden">
                             <div class="p-6">
                                 <div class="flex flex-wrap gap-4 text-sm mb-4 pb-4 border-b border-slate-200">
