@@ -24,8 +24,7 @@
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
         
-        /* --- FIX: Accordion Transition --- */
-        /* 修正展開動畫：移除 Tailwind 的 class 衝突，改用這裡的設定 */
+        /* Accordion Transition Fix */
         .accordion-content {
             display: grid;
             transition: grid-template-rows 0.4s ease-out;
@@ -73,12 +72,11 @@
             <div class="mb-8 md:mb-0 w-full">
                 <div class="inline-block px-3 py-1 bg-yellow-400 text-teal-900 rounded-full text-xs font-bold tracking-wider mb-2 shadow-lg">南投・彰化</div>
                 <h1 class="text-4xl md:text-6xl font-display font-black leading-tight mb-2 drop-shadow-lg">
-                    週末小旅行
+                    南投週末小旅行
                     <span class="block text-2xl font-medium opacity-90 mt-1 font-sans">Relaxing Getaway</span>
                 </h1>
-                <p class="text-white/80 text-sm md:text-base max-w-lg drop-shadow-md">
-                    探索南投的隱藏美景，從童話城堡到森林秘境，
-                    享受兩天一夜的慢活時光。
+                <p class="text-white/90 text-sm md:text-base max-w-lg drop-shadow-md leading-relaxed">
+                    暫別城市喧囂，走進南投童話秘境。入住夢幻藍色城堡，暢遊恐龍森林與動物樂園。在慢活步調中，享受兩天一夜的極致放鬆時光。
                 </p>
             </div>
             
@@ -443,8 +441,6 @@
             // Get Image Data
             const images = SCENE_IMAGES[item.id] || { main: "https://images.unsplash.com/photo-1527631746610-bca00a040d60?q=80&w=400", extra1: "", extra2: "" };
 
-            // FIX: Removed "grid-rows-[0fr]" which conflicted with JS logic
-            // Added "accordion-closed" initially
             el.innerHTML = `
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1" onclick="toggleDetails('${item.id}')">
                     <div class="flex flex-col md:flex-row min-h-[140px]">
