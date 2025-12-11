@@ -76,7 +76,7 @@
                     <span class="block text-2xl font-medium opacity-90 mt-1 font-sans">Relaxing Getaway</span>
                 </h1>
                 <p class="text-white/90 text-sm md:text-base max-w-lg drop-shadow-md leading-relaxed">
-                    暫別城市喧囂，走進南投童話秘境。入住夢幻藍色城堡，暢遊恐龍森林與動物樂園。在慢活步調中，享受兩天一夜的極致放鬆時光。
+                    走進南投童話秘境。入住夢幻藍色城堡，暢遊恐龍森林與動物樂園。在慢活步調中，享受兩天一夜的極致放鬆時光。
                 </p>
             </div>
             
@@ -104,7 +104,7 @@
     <div class="flex justify-center -mt-8 mb-10 relative z-40">
         <div class="bg-white p-1.5 rounded-full shadow-xl flex items-center gap-1 border border-slate-100 ring-4 ring-slate-50/50">
             
-            <button id="tab-day1" onclick="switchDay(1)" class="relative w-40 py-3 rounded-full transition-all duration-300 flex flex-col items-center justify-center group overflow-hidden bg-teal-600 text-white shadow-md">
+            <button id="tab-day1" onclick="switchDay(1)" class="relative w-32 md:w-40 h-14 rounded-full transition-all duration-300 flex flex-col items-center justify-center group overflow-hidden bg-teal-600 text-white shadow-md">
                 <div class="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 
                 <div class="relative flex items-baseline gap-2">
@@ -113,7 +113,7 @@
                 <span class="relative text-[10px] font-bold opacity-80 tracking-wider">12/20 SAT</span>
             </button>
     
-            <button id="tab-day2" onclick="switchDay(2)" class="relative w-40 py-3 rounded-full transition-all duration-300 flex flex-col items-center justify-center group text-slate-400 hover:text-slate-600 hover:bg-slate-50">
+            <button id="tab-day2" onclick="switchDay(2)" class="relative w-32 md:w-40 h-14 rounded-full transition-all duration-300 flex flex-col items-center justify-center group text-slate-400 hover:text-slate-600 hover:bg-slate-50">
                 <div class="relative flex items-baseline gap-2">
                     <span class="text-lg font-black tracking-widest font-display">DAY 2</span>
                 </div>
@@ -468,7 +468,7 @@
                             <div class="bg-slate-50 rounded-lg px-3 py-2 border border-slate-100 flex items-center justify-between gap-2 text-xs text-slate-500 mt-2">
                                 <div class="text-center font-bold text-slate-700 w-16 truncate">${item.route.from}</div>
                                 <div class="flex-1 flex flex-col items-center">
-                                    <span class="material-symbols-outlined text-xs text-teal-500">${item.route.method === '走路' ? 'directions_walk' : 'directions_car'}</span>
+                                    <span class="material-symbols-outlined text-2xl text-teal-600">${item.route.method === '走路' ? 'directions_walk' : 'directions_car'}</span>
                                     <div class="h-0.5 w-full bg-slate-300 relative my-0.5"></div>
                                     <span class="text-[14px] bg-white px-1 rounded shadow-sm border border-slate-100 relative -top-1.5">${item.route.duration}</span>
                                 </div>
